@@ -3,6 +3,9 @@ import os
 import tkinter
 import PIL.Image, PIL.ImageTk
 
+from search import Search
+
+
 prefix = os.getcwd()
 
 tk = Tk()
@@ -18,9 +21,14 @@ small_font = ('Verdana bold',28)
 blue_color = "#4da6ff"
 
 bg = PhotoImage(file=f"{prefix}/data/bg.png")
+cancel_icon_ = PIL.Image.open(f"{prefix}/data/cancel-icon.png")
+cancel_icon = cancel_icon_.resize((60,60))
+cancel_icon = PIL.ImageTk.PhotoImage(cancel_icon)
+
 main = Label(tk, image=bg, width=1920, height=1080)
 main.place(x=0, y=0)
 
+search = Search(tk, cancel_icon)
 
 def findXCenter(canvas, item):
     coords = canvas.bbox(item)
@@ -29,7 +37,7 @@ def findXCenter(canvas, item):
     return xOffset, yOffset
 
 def search_function():
-    print(f"Searching: {ID.get()}")
+    search.main(ID.get())
 
 def character_limit(entry_text):
     if len(entry_text.get()) > 8:
