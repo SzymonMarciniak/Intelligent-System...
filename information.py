@@ -33,8 +33,8 @@ If so, you've come to the right place.\n\n I am a system that will find the loca
             self.polish_language()
 
     def polish_language(self):
-        self.description.config(text="""Cześć,\n Zapomniałeś gdzie zaparkowałeś samochód?\n
-Jeśli tak to dobrze trafiłeś.\n\n Jestem systemem, który znajdzie polożenie\n Twojego samochodu, na parkingu podziemnym.""") 
+        self.description.config(text="""Cześć,\n Zapomniałeś/aś gdzie zaparkowałeś/aś samochód?\n
+Jeśli tak to dobrze trafiłeś/aś.\n\n Jestem systemem, który znajdzie położenie\n Twojego samochodu, na parkingu podziemnym.""") 
     def english_language(self):
         self.description.config(text="""Hello,\n Have you forgotten where you parked your car?\n
 If so, you've come to the right place.\n\n I am a system that will find the location\n of your car, in the underground parking.""") 

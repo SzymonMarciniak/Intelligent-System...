@@ -64,6 +64,10 @@ class Main:
         label_up.config(anchor=N)
         label_up.pack(side=TOP)
 
+        car_photo_ = PIL.Image.open(f"{self.prefix}/data/car.jpg")
+        car_photo_ = car_photo_.resize((650,450))
+        self.car_photo = PIL.ImageTk.PhotoImage(car_photo_)
+
         english_flag_photo_ = PIL.Image.open(f"{self.prefix}/data/ef.png")
         english_flag_photo_ = english_flag_photo_.resize((57,57))
         english_flag_photo = PIL.ImageTk.PhotoImage(english_flag_photo_)
@@ -141,7 +145,7 @@ class Main:
         if reopen:
             self.search.exit_search()
         self.tk.SearchIsOpen = True
-        self.search.main(self.ID.get(), self.language)
+        self.search.main(self.ID.get(), self.language, self.car_photo)
     
     def info_function(self, reopen=False):
         if reopen:
