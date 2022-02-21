@@ -116,6 +116,11 @@ class Main:
             activebackground="#cfcfcf", relief=GROOVE)
         self.search_button.grid(row=0, column=2, padx=(20,0))
 
+        img_car_path = os.path.join("AIData", "test", f"Cars412.png")
+        car_img = PIL.Image.open(img_car_path)
+        car_img = car_img.resize((650,450))
+        self.car_img = PIL.ImageTk.PhotoImage(car_img)
+
         self.tk.mainloop()
     
     def polish_language(self):
@@ -145,13 +150,22 @@ class Main:
         if reopen:
             self.search.exit_search()
         self.tk.SearchIsOpen = True
-        self.search.main(self.ID.get(), self.language, self.car_photo)
+        self.search.main(self.ID.get(), self.language, self.car_photo, self.car_img)
     
     def info_function(self, reopen=False):
         if reopen:
             self.info.exit_info()
         self.tk.InfoIsOpen = True
         self.info.main(self.language) 
+    
+    def car_image_search(self, car_nr):
+        img_path = os.path.join("AIData", "test", f"Cars{car_nr}.png")
+        img = PIL.Image.open(img_path)
+        img = img.resize((650,450))
+        image = PIL.ImageTk.PhotoImage(img)
+
+        return image
+    
 
 if __name__=="__main__":
     main = Main(tk)
