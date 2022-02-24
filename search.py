@@ -1,13 +1,17 @@
 from tkinter import *
 import PIL.Image, PIL.ImageTk
+import json 
 import os
 
-from AImain import detect_plate, get_registration_numbers
 
 blue_color = "#4da6ff"
 small_font = ('Verdana bold',28)
 large_font = ('Verdana bold',35)
 extralarge_font = ('Verdana bold',100)
+
+prefix = os.getcwd()
+db = f"{prefix}/DataBase.json"
+
 class Search:
     def __init__(self, tk: LabelFrame, cancel_icon: PhotoImage) -> None:
         self.tk = tk
@@ -68,31 +72,17 @@ class Search:
 
     def registration_checking(self, car_registration):
 
-        detection_threshold = 0.4
-        region_treshold = 0.6
-        text_threshold = 0.7
+        with open(db, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            cars_registrations = data["db"]["cars"]["registrations"]
+            cars_locations = data["db"]["cars"]["locations"]
+        
+        if car_registration in cars_registrations:
+            location_index = cars_registrations.index(car_registration)
+            car_location = cars_locations[location_index]
 
-        images = ["402", "400", "412"]
-
-        for car_nr in images:
-            image_np_with_detections, detections, _ = detect_plate(car_number=car_nr)
-            image = image_np_with_detections
-            text, _ = get_registration_numbers(image, detections, detection_threshold, region_treshold, text_threshold)
-            text = text[0].upper()
-            if text == car_registration:
-                break
-            else:
-                text=None
-
-    
-        if text:
-            # from main import Main
-            # main = Main(self.tk)
-
-            print(f"Registration: {text} - SUCCESS")
-            #image = main.car_image_search(car_nr)
-          
-            self.car_image_label.config(image=self.found_car_image)
+            print(f"Car: {car_registration} found in {car_location}")
+        
         else:
-            print(f"Registration {car_registration} no found")
+            print(f"Car: {car_registration} no found")
 

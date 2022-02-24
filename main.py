@@ -1,10 +1,12 @@
 from tkinter import *
 import os
 import tkinter
+import threading
 import PIL.Image, PIL.ImageTk
 
 from search import Search
 from information import Info
+from AImain import AImanager
 
 tk = Tk()
 tk.attributes("-fullscreen", True)
@@ -168,8 +170,14 @@ class Main:
     
 
 if __name__=="__main__":
+
+    AIThread = threading.Thread(target=AImanager)
+    AIThread.start()
+
     main = Main(tk)
     main.main_function()
+
+
 
 
 # "#334cc0"

@@ -3,6 +3,9 @@ import numpy as np
 import tensorflow as tf
 import os
 import easyocr
+import schedule
+import time
+import json 
 
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
@@ -17,7 +20,8 @@ from object_detection.utils import config_util
 #     except RuntimeError as e:
 #         print(f"Błąd: {e}")
 
-
+prefix = os.getcwd()
+db = f"{prefix}/DataBase.json"
 
 configs = config_util.get_configs_from_pipeline_file(os.path.join("AIData", "pipeline.config"))
 detection_model = model_builder.build(model_config=configs['model'], is_training=False)
@@ -101,6 +105,53 @@ def get_registration_numbers(image, detections, detection_threshold, region_tres
     text = text_filtering(region, ocr_results, region_treshold)
     print(text)
     return text, region
+
+def AImain():
+    
+    detection_threshold = 0.4
+    region_treshold = 0.6
+    text_threshold = 0.7
+
+    with open(db, "r", encoding="utf-8") as file:
+        data = json.load(file)
+        images = data["db"]["cameras"]
+
+    for car_nr in images:
+        image_np_with_detections, detections, _ = detect_plate(car_number=car_nr)
+        image = image_np_with_detections
+        text, _ = get_registration_numbers(image, detections, detection_threshold, region_treshold, text_threshold)
+        if text:
+            text = text[0].upper()
+        
+            with open(db, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                P_cars_registrations = data["db"]["cars"]["registrations"]
+
+                if not text in P_cars_registrations:
+                    P_cars_registrations.append(text)
+                    C_cars_registrations = P_cars_registrations
+                
+                    P_cars_locations = data["db"]["cars"]["locations"]
+                    P_cars_locations.append(car_nr)
+                    C_cars_locations = P_cars_locations
+
+                    with open(db, "w", encoding="utf-8") as file_w:
+                        data["db"]["cars"]["registrations"] = C_cars_registrations
+                        data["db"]["cars"]["locations"] = C_cars_locations
+                        json.dump(data, file_w, ensure_ascii=False, indent=4)
+                    file_w.close()
+
+            file.close()
+
+        
+    
+def AImanager():
+    schedule.every(1).minutes.do(AImain)
+    AImain()
+    while True:
+        schedule.run_pending()
+        time.sleep(10)
+    
 
 """
 images = ["400", "401", "402", "403", "412"]
