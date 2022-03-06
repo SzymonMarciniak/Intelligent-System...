@@ -1,5 +1,6 @@
 from tkinter import *
 import os
+import json
 import tkinter
 import threading
 import PIL.Image, PIL.ImageTk
@@ -22,11 +23,13 @@ small_font = ('Verdana bold',28)
 
 blue_color = "#4da6ff"
 
+prefix = os.getcwd()
+db = f"{prefix}/DataBase.json"
+
 class Main:
     def __init__(self, tk:Frame) -> None:
 
         self.tk = tk
-
         self.prefix = os.getcwd()
 
         self.bg = PhotoImage(file=f"{self.prefix}/data/bg.png")
@@ -109,8 +112,8 @@ class Main:
         main_canvas.place(relx=0.5, rely=0.7, anchor=CENTER)
 
         self.ID = tkinter.StringVar()
-        search_place = Entry(main_canvas, width=20, textvariable=self.ID, font=large_font, justify=CENTER, bd=3)
-        search_place.grid(row=0,column=1, padx=(10,10), ipady=20)
+        self.search_place = Entry(main_canvas, width=20, textvariable=self.ID, font=large_font, justify=CENTER, bd=3)
+        self.search_place.grid(row=0,column=1, padx=(10,10), ipady=20)
         self.ID.trace("w", lambda *args: self.character_limit(self.ID))
         self.ID.trace_add('write', self.to_uppercase)
 
@@ -118,10 +121,16 @@ class Main:
             activebackground="#cfcfcf", relief=GROOVE)
         self.search_button.grid(row=0, column=2, padx=(20,0))
 
-        img_car_path = os.path.join("AIData", "test", f"Cars412.png")
-        car_img = PIL.Image.open(img_car_path)
-        car_img = car_img.resize((650,450))
-        self.car_img = PIL.ImageTk.PhotoImage(car_img)
+        self.cameras = []
+        self.cameras_nr = []
+
+        self.check_cameras()
+        print(self.cameras)
+        
+        img_path = os.path.join("data", "sad.png")
+        img = PIL.Image.open(img_path)
+        img = img.resize((400,400))
+        self.sad_image = PIL.ImageTk.PhotoImage(img)
 
         self.tk.mainloop()
     
@@ -152,7 +161,8 @@ class Main:
         if reopen:
             self.search.exit_search()
         self.tk.SearchIsOpen = True
-        self.search.main(self.ID.get(), self.language, self.car_photo, self.car_img)
+        self.search.main(self.ID.get(), self.language, self.car_photo, self.cameras, self.sad_image)
+        self.search_place.delete(0, 'end')
     
     def info_function(self, reopen=False):
         if reopen:
@@ -160,13 +170,24 @@ class Main:
         self.tk.InfoIsOpen = True
         self.info.main(self.language) 
     
-    def car_image_search(self, car_nr):
-        img_path = os.path.join("AIData", "test", f"Cars{car_nr}.png")
-        img = PIL.Image.open(img_path)
-        img = img.resize((650,450))
-        image = PIL.ImageTk.PhotoImage(img)
 
-        return image
+    def check_cameras(self):
+        with open(db, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            cameras = data["db"]["cameras"]
+
+        for nr in cameras:
+            if not nr in self.cameras_nr:
+                self.cameras_nr.append(nr)
+                img_car_path = os.path.join("AIData", "test", f"Cars{nr}.png")
+                car_img = PIL.Image.open(img_car_path)
+                car_img = car_img.resize((650,450))
+                car_img = PIL.ImageTk.PhotoImage(car_img)
+                self.cameras.append(car_img)
+            print(self.cameras)
+    
+        self.tk.after(5000, self.check_cameras)
+
     
 
 if __name__=="__main__":
@@ -178,9 +199,6 @@ if __name__=="__main__":
     main.main_function()
 
 
-
-
-# "#334cc0"
 
 
 
