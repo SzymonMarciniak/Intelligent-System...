@@ -20,11 +20,43 @@ windowHeight = 1080
 extralarge_font = ('Verdana bold',40)
 large_font = ('Verdana bold',35)
 small_font = ('Verdana bold',28)
+mini_font = ("Verdana", 19)  
 
 blue_color = "#4da6ff"
 
 prefix = os.getcwd()
 db = f"{prefix}/DataBase.json"
+
+
+keys =[ 
+[
+ [
+  ("Character_Keys"),
+  ({'side':'top','expand':'yes','fill':'both'}),
+  [
+   ('`','1','2','3','4','5','6','7','8','9','0','-','=','\\','backspace'),
+   ('tab','q','w','e','r','t','y','u','i','o','p','[',']','   '),
+   ('capslock','a','s','d','f','g','h','j','k','l',';',"'","enter"),
+   ("shift",'z','x','c','v','b','n','m',',','.','/',"shift"),
+   ("ctrl", "[+]",'alt','\t\tspace\t\t','alt','[+]','[=]','ctrl')
+  ]
+ ]
+],
+
+[
+
+ [
+  ("Numeric_Keys"),
+  ({'side':'top','expand':'yes','fill':'both'}),
+  [
+   ("7","8","9"),
+   ("4","5","6"),
+   ("1","2","3"),
+   ("0",".","Backspace")
+  ]
+ ],
+]
+]
 
 class Main:
     def __init__(self, tk:Frame) -> None:
@@ -62,8 +94,8 @@ class Main:
     
     def main_function(self):        
 
-        toolFrame = LabelFrame(self.main, bd=3, bg="white", width=875, height=275, highlightbackground=blue_color, background=blue_color)
-        toolFrame.place(relx=0.5, rely=0.5, anchor=CENTER)
+        self.toolFrame = LabelFrame(self.main, bd=3, bg="white", width=875, height=275, highlightbackground=blue_color, background=blue_color)
+        self.toolFrame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
         label_up = Label(self.tk,text="", bg=blue_color, width=1920, height=5)
         label_up.config(anchor=N)
@@ -100,15 +132,15 @@ class Main:
         info.place(relx=0.02, rely=0)
         info.image = info_photo
 
-        label_down = Label(self.tk,text="", bg=blue_color, width=1920, height=5)
-        label_down.config(anchor=E)
-        label_down.pack(side=BOTTOM)
+        self.label_down = Label(self.tk,text="", bg=blue_color, width=1920, height=5)
+        self.label_down.config(anchor=E)
+        self.label_down.pack(side=BOTTOM)
 
-        self.hello_label = Label(toolFrame, text="Enter yours car registration numbers", fg="black", bg="white", font=large_font, \
+        self.hello_label = Label(self.toolFrame, text="Enter yours car registration numbers", fg="black", bg="white", font=large_font, \
             highlightbackground="white", highlightthickness=8)
         self.hello_label.place(relx=0.5, rely=0.2, anchor=CENTER)
 
-        main_canvas = Canvas(toolFrame, width=1000, height=500, bg=blue_color, highlightthickness=0)
+        main_canvas = Canvas(self.toolFrame, width=1000, height=500, bg=blue_color, highlightthickness=0)
         main_canvas.place(relx=0.5, rely=0.7, anchor=CENTER)
 
         self.ID = tkinter.StringVar()
@@ -116,6 +148,7 @@ class Main:
         self.search_place.grid(row=0,column=1, padx=(10,10), ipady=20)
         self.ID.trace("w", lambda *args: self.character_limit(self.ID))
         self.ID.trace_add('write', self.to_uppercase)
+        self.search_place.bind("<Button-1>", self.set_keyboard)
 
         self.search_button = Button(main_canvas, text="Search", command=self.search_function, pady=22, padx=60, font=small_font, bg="white", bd=7, \
             activebackground="#cfcfcf", relief=GROOVE)
@@ -123,6 +156,10 @@ class Main:
 
         self.cameras = []
         self.cameras_nr = []
+
+        self.Key = Frame(self.tk, background="white",pady=3)
+        keyboard = Keyboard(self.Key)
+        
 
         self.check_cameras()
         print(self.cameras)
@@ -158,8 +195,14 @@ class Main:
             self.info_function(reopen=True)
         
     def search_function(self, reopen=False):
+
+        self.Key.pack_forget()
+        self.label_down.pack(side=BOTTOM)
+        self.toolFrame.place_configure(rely=.5)
+        
         if reopen:
-            self.search.exit_search()
+            self.search.exit_search()      
+
         self.tk.SearchIsOpen = True
         self.search.main(self.ID.get(), self.language, self.car_photo, self.cameras, self.sad_image)
         self.search_place.delete(0, 'end')
@@ -184,9 +227,58 @@ class Main:
                 car_img = car_img.resize((650,450))
                 car_img = PIL.ImageTk.PhotoImage(car_img)
                 self.cameras.append(car_img)
-            print(self.cameras)
     
         self.tk.after(5000, self.check_cameras)
+    
+    def set_keyboard(self, *args):
+        self.label_down.pack_forget()
+        self.toolFrame.place_configure(rely=0.33)
+        self.Key.pack(side=BOTTOM,expand=NO,fill=BOTH)
+    
+    # Function For Detecting Pressed Keyword.
+    def button_command(self, event):
+        print(event)
+        
+    
+
+
+class Keyboard():
+    def __init__(self, frame):
+        self.frame = frame
+        self.create_frames_and_buttons()
+
+    def create_frames_and_buttons(self):
+     
+        for key_section in keys:
+            # create Sperate Frame For Every Section
+            store_section = Frame(self.frame)
+            store_section.pack(side='left',expand='yes',fill='both',padx=10,pady=10,ipadx=10,ipady=10)       
+            for layer_name, layer_properties, layer_keys in key_section:
+                store_layer = LabelFrame(store_section)#, text=layer_name)
+                #store_layer.pack(side='top',expand='yes',fill='both')
+                store_layer.pack(layer_properties)
+                for key_bunch in layer_keys:
+                    store_key_frame = Frame(store_layer)
+                    store_key_frame.pack(side='top',expand='yes',fill='both')
+                    for k in key_bunch:
+                        k=k.capitalize()
+                        if len(k)<=3:
+                            store_button = Button(store_key_frame, text=k, width=3, height=3, font=mini_font)
+                        else:
+                            store_button = Button(store_key_frame, text=k.center(6,' '), height=3, font=mini_font)
+                        if " " in k:
+                            store_button['state']='disable'
+                        #flat, groove, raised, ridge, solid, or sunken
+                        store_button['relief']="sunken"
+                        store_button['bg']="powderblue"
+                        store_button['command']=lambda q=k: Main.button_command(self, q)
+                        store_button.pack(side='left',fill='both',expand='yes')
+        return
+
+    
+        
+    
+
 
     
 
@@ -197,17 +289,5 @@ if __name__=="__main__":
 
     main = Main(tk)
     main.main_function()
-
-
-
-
-
-
-
-
-
-
-
-
 
 

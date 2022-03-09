@@ -96,14 +96,16 @@ def get_registration_numbers(image, detections, detection_threshold, region_tres
     width= image.shape[1]
     height = image.shape[0]
 
+    region = None
+    text = None
     for _, box in enumerate(boxes):
         roi = box*[height, width, height, width] #region of interest
         region = image[int(roi[0]):int(roi[2]), int(roi[1]): int(roi[3])]
         reader = easyocr.Reader(['en'])
         ocr_results = reader.readtext(region, text_threshold=text_threshold)
 
-    text = text_filtering(region, ocr_results, region_treshold)
-    print(text)
+    if region is not None:
+        text = text_filtering(region, ocr_results, region_treshold)
     return text, region
 
 def AImain():
