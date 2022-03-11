@@ -1,9 +1,11 @@
+from tkinter import messagebox
 from tkinter.ttk import Notebook, Style
-from turtle import width
 import PIL.Image, PIL.ImageTk
 from tkinter import *
 import json 
 import os
+
+from cv2 import CAP_PROP_XI_ACQ_TRANSPORT_BUFFER_COMMIT
 
 mini_font = ("Verdana", 15)                                                                                                                                                              
 small_font = ('Verdana',20)
@@ -223,11 +225,79 @@ class MainConfig:
     
     def add_camera_function(self):
         print("Adding....")
+        camera_id = self.AddID.get()
+        camera_place = self.Addplace.get()
+
+        check = self.check_if_not_empty((camera_id, camera_place))
+        
+        if check:
+            with open(db, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                c_cameras = data["db"]["cameras"]
+                c_cameras.append(camera_place)
+                data["db"]["cameras"] = c_cameras #to do
+
+            with open(db, "w") as file:
+                json.dump(data, file, ensure_ascii=False, indent=4) 
+
     def config_camera_function(self):
         print("Configure....")
+        old_camera_id = self.OldConfID.get()
+        old_camera_place = self.OldConfplace.get()
+        new_camera_id = self.NewConfID.get()
+        new_camera_place = self.NewConfplace.get()
+
+        check = self.check_if_not_empty((old_camera_id, old_camera_place, new_camera_id, new_camera_place))
+    
+        if check:
+            with open(db, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                c_cameras = data["db"]["cameras"]
+                if old_camera_place in c_cameras:
+                    idx = c_cameras.index(old_camera_place)
+                    c_cameras[idx] = new_camera_place
+                    data["db"]["cameras"] = c_cameras
+
+                    with open(db, "w", encoding="utf-8") as file:
+                        json.dump(data, file, ensure_ascii=False, indent=4)
+                else:
+                    answer = messagebox.showinfo("Error", f"Cmaera {old_camera_place} not found")
+
     def delete_camera_function(self):
         print("Deleting....")
-    
+
+        camera_id = self.DelID.get()    
+        camera_place = self.Delplace.get()
+
+        if camera_place:
+            with open(db, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                c_cameras = data["db"]["cameras"]
+                if camera_place in c_cameras:
+                    c_cameras.remove(camera_place)
+
+                with open(db, "w", encoding="utf-8") as file:
+                    json.dump(data, file, ensure_ascii=False, indent=4)
+
+        elif camera_id:
+            with open(db, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                c_cameras = data["db"]["cameras"]
+                if camera_id in c_cameras: pass #To do 
+        
+        else:
+            _ = self.check_if_not_empty((camera_id, camera_place))
+        
+
+    @staticmethod    
+    def check_if_not_empty(values):
+        for value in values:
+            if value: pass 
+            else:
+                answer = messagebox.showinfo("Error", "Fields can't be empty")
+                return False 
+        return True 
+
 
             
 
