@@ -57,6 +57,9 @@ keys =[
  ],
 ]
 ]
+ID = tkinter.StringVar()
+global todo
+todo = 1
 
 class Main:
     def __init__(self, tk:Frame) -> None:
@@ -89,8 +92,18 @@ class Main:
         if len(entry_text.get()) > 8:
             entry_text.set(entry_text.get()[:-1])
 
-    def to_uppercase(self, *args):
-        self.ID.set(self.ID.get().upper())
+    def to_uppercase(self, events= None,*args):
+        global todo
+        todo += 1
+     
+        if not events:
+            ID.set(ID.get().upper())
+        else:
+            if todo <= 2:
+                print(events[0])
+                ID.set(f"{ID.get()}{events[0]}") 
+            else:
+                todo = 1
     
     def main_function(self):        
 
@@ -143,11 +156,10 @@ class Main:
         main_canvas = Canvas(self.toolFrame, width=1000, height=500, bg=blue_color, highlightthickness=0)
         main_canvas.place(relx=0.5, rely=0.7, anchor=CENTER)
 
-        self.ID = tkinter.StringVar()
-        self.search_place = Entry(main_canvas, width=20, textvariable=self.ID, font=large_font, justify=CENTER, bd=3)
+        self.search_place = Entry(main_canvas, width=20, textvariable=ID, font=large_font, justify=CENTER, bd=3)
         self.search_place.grid(row=0,column=1, padx=(10,10), ipady=20)
-        self.ID.trace("w", lambda *args: self.character_limit(self.ID))
-        self.ID.trace_add('write', self.to_uppercase)
+        ID.trace("w", lambda *args: self.character_limit(ID))
+        ID.trace_add('write', self.to_uppercase)
         self.search_place.bind("<Button-1>", self.set_keyboard)
 
         self.search_button = Button(main_canvas, text="Search", command=self.search_function, pady=22, padx=60, font=small_font, bg="white", bd=7, \
@@ -195,16 +207,18 @@ class Main:
             self.info_function(reopen=True)
         
     def search_function(self, reopen=False):
-
+        global todo
         self.Key.pack_forget()
         self.label_down.pack(side=BOTTOM)
         self.toolFrame.place_configure(rely=.5)
+
+        todo = 3
         
         if reopen:
             self.search.exit_search()      
 
         self.tk.SearchIsOpen = True
-        self.search.main(self.ID.get(), self.language, self.car_photo, self.cameras, self.sad_image)
+        self.search.main(ID.get(), self.language, self.car_photo, self.cameras, self.sad_image)
         self.search_place.delete(0, 'end')
     
     def info_function(self, reopen=False):
@@ -235,11 +249,7 @@ class Main:
         self.toolFrame.place_configure(rely=0.33)
         self.Key.pack(side=BOTTOM,expand=NO,fill=BOTH)
     
-    # Function For Detecting Pressed Keyword.
-    def button_command(self, event):
-        print(event)
-        
-    
+  
 
 
 class Keyboard():
@@ -248,7 +258,7 @@ class Keyboard():
         self.create_frames_and_buttons()
 
     def create_frames_and_buttons(self):
-     
+            
         for key_section in keys:
             # create Sperate Frame For Every Section
             store_section = Frame(self.frame)
@@ -271,7 +281,7 @@ class Keyboard():
                         #flat, groove, raised, ridge, solid, or sunken
                         store_button['relief']="sunken"
                         store_button['bg']="powderblue"
-                        store_button['command']=lambda q=k: Main.button_command(self, q)
+                        store_button['command']=lambda q=k: Main.to_uppercase(self,events=q)
                         store_button.pack(side='left',fill='both',expand='yes')
         return
 
