@@ -34,11 +34,10 @@ keys =[
   ("Character_Keys"),
   ({'side':'top','expand':'yes','fill':'both'}),
   [
-   ('`','1','2','3','4','5','6','7','8','9','0','-','=','\\','backspace'),
-   ('tab','q','w','e','r','t','y','u','i','o','p','[',']','   '),
-   ('capslock','a','s','d','f','g','h','j','k','l',';',"'","enter"),
-   ("shift",'z','x','c','v','b','n','m',',','.','/',"shift"),
-   ("ctrl", "[+]",'alt','\t\tspace\t\t','alt','[+]','[=]','ctrl')
+   ('1','2','3','4','5','6','7','8','9','0','Backspace'),
+   ('  ','q','w','e','r','t','y','u','i','o','p',' ',' ','   '),
+   ('       ','a','s','d','f','g','h','j','k','l',"       ","       "),
+   ("          ",'z','x','c','v','b','n','m',' ', ' ', ' ', " ")
   ]
  ]
 ],
@@ -52,7 +51,7 @@ keys =[
    ("7","8","9"),
    ("4","5","6"),
    ("1","2","3"),
-   ("0",".","Backspace")
+   ("0","      Backspace       ")
   ]
  ],
 ]
@@ -95,13 +94,14 @@ class Main:
     def to_uppercase(self, events= None,*args):
         global todo
         todo += 1
-     
         if not events:
             ID.set(ID.get().upper())
         else:
             if todo <= 2:
-                print(events[0])
-                ID.set(f"{ID.get()}{events[0]}") 
+                if len(events) == 1:
+                    ID.set(f"{ID.get()}{events}") 
+                elif events == "Backspace": 
+                    ID.set(f"{ID.get()[:-1]}")      
             else:
                 todo = 1
     
@@ -246,7 +246,7 @@ class Main:
     
     def set_keyboard(self, *args):
         self.label_down.pack_forget()
-        self.toolFrame.place_configure(rely=0.33)
+        self.toolFrame.place_configure(rely=0.30)
         self.Key.pack(side=BOTTOM,expand=NO,fill=BOTH)
     
   
@@ -258,9 +258,8 @@ class Keyboard():
         self.create_frames_and_buttons()
 
     def create_frames_and_buttons(self):
-            
+        x = 0
         for key_section in keys:
-            # create Sperate Frame For Every Section
             store_section = Frame(self.frame)
             store_section.pack(side='left',expand='yes',fill='both',padx=10,pady=10,ipadx=10,ipady=10)       
             for layer_name, layer_properties, layer_keys in key_section:
@@ -275,16 +274,25 @@ class Keyboard():
                         if len(k)<=3:
                             store_button = Button(store_key_frame, text=k, width=3, height=3, font=mini_font)
                         else:
-                            store_button = Button(store_key_frame, text=k.center(6,' '), height=3, font=mini_font)
+                            if x == 0:
+                                store_button = Button(store_key_frame, text=k.center(6,' '), height=3, font=mini_font)
+                                x = 1
+                            else:
+                                if "space" in k:
+                                    k = "Backspace"
+                                    store_button = Button(store_key_frame, text=k.center(21,' '), height=3, font=mini_font)
+                                else:
+                                    store_button = Button(store_key_frame, text=k.center(6,' '), height=3, font=mini_font)
                         if " " in k:
-                            store_button['state']='disable'
+                            if not "Backspace" in k:
+                                store_button['state']='disable'
                         #flat, groove, raised, ridge, solid, or sunken
                         store_button['relief']="sunken"
                         store_button['bg']="powderblue"
                         store_button['command']=lambda q=k: Main.to_uppercase(self,events=q)
                         store_button.pack(side='left',fill='both',expand='yes')
         return
-
+        
     
         
     
