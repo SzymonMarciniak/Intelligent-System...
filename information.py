@@ -15,7 +15,7 @@ class Info:
         self.tk.InfoIsOpen = False
 
     def main(self, language):
-        self.infoFrame = LabelFrame(self.tk, bd=5, bg="white", width=800, height=800, highlightbackground=blue_color, background=blue_color )
+        self.infoFrame = LabelFrame(self.tk, bd=5, bg="white", width=800, height=800, highlightbackground=blue_color, background=blue_color)
         self.infoFrame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
         cancel_button = Button(self.infoFrame, image=self.cancel_icon, borderwidth=0, bg=blue_color, bd=0, highlightthickness=0, \

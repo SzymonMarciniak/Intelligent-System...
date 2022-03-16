@@ -128,18 +128,27 @@ def AImain():
             with open(db, "r", encoding="utf-8") as file:
                 data = json.load(file)
                 P_cars_registrations = data["db"]["cars"]["registrations"]
+                camera = data["db"]["cars"]["camera"]
 
                 if not text in P_cars_registrations:
+                    cameras = data["db"]["cameras"]
+                    idx = cameras.index(car_nr)
+                    places = data["db"]["places"]
+                    place = places[idx]  
+
                     P_cars_registrations.append(text)
                     C_cars_registrations = P_cars_registrations
                 
                     P_cars_locations = data["db"]["cars"]["locations"]
-                    P_cars_locations.append(car_nr)
+                    P_cars_locations.append(place)
                     C_cars_locations = P_cars_locations
+
+                    camera.append(car_nr)
 
                     with open(db, "w", encoding="utf-8") as file_w:
                         data["db"]["cars"]["registrations"] = C_cars_registrations
                         data["db"]["cars"]["locations"] = C_cars_locations
+                        data["db"]["cars"]["camera"] = camera
                         json.dump(data, file_w, ensure_ascii=False, indent=4)
                     file_w.close()
 

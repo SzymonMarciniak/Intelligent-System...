@@ -54,8 +54,6 @@ class MainConfig:
         notebook.add(tab1, text = 'Camera preview')
         tab2 = Frame(notebook)
         notebook.add(tab2, text = 'Add camera')
-        tab3 = Frame(notebook)
-        notebook.add(tab3, text = 'Tab 3')
         notebook.pack(expand=True, fill=BOTH, padx=12, pady=12)
 
         #Camera preview tab
@@ -111,6 +109,7 @@ class MainConfig:
         with open(db, "r", encoding="utf-8") as file:
             data = json.load(file)
             images = data["db"]["cameras"]
+            places = data["db"]["places"]
         images_amount = len(images)
 
         self.mainFrame.config(text=f"Cameras available: {images_amount}")
@@ -125,10 +124,10 @@ class MainConfig:
 
         for i in range(1,images_amount+1):
 
-            self.aLabel = Label(self.camerasFrame, text=f"camera {i} - {images[i-1]}", font=mini_font)
+            self.aLabel = Label(self.camerasFrame, text=f"{places[i-1]} - {images[i-1]}", font=mini_font)
             self.aLabel.grid(column=cc, row=cr, padx=(55,55), pady=(_y, 5))
 
-            self.camera_1_button = Button(self.camerasFrame, image=self.images[i-1], command=lambda:print(f"Camera {i}"), bd=1)
+            self.camera_1_button = Button(self.camerasFrame, image=self.images[i-1], command=lambda:print(f"Camera {places[i-1]}"), bd=1)
             self.camera_1_button.grid(column=cc, row=cr+1, padx=(_x,55), pady=(0,40))
 
             if i % 3 == 0:

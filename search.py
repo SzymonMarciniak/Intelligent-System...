@@ -79,21 +79,22 @@ class Search:
         with open(db, "r", encoding="utf-8") as file:
             data = json.load(file)
             cars_registrations = data["db"]["cars"]["registrations"]
-            cars_locations = data["db"]["cars"]["locations"]
+            cars_locations = data["db"]["cars"]["camera"]
             all_cameras = data["db"]["cameras"]
+            all_places = data["db"]["cars"]["locations"]
         
         if car_registration in cars_registrations:
             location_index = cars_registrations.index(car_registration)
             car_location = cars_locations[location_index]
+            car_place = all_places[location_index]
 
             camera_id = all_cameras.index(car_location)
             self.car_image_label.config(image=self.cameras[camera_id])
             self.car_image_label.place_configure(rely=.23, relx=.05)
-            self.car_location_label.config(text=car_location)
+            self.car_location_label.config(text=car_place)
             cx = 0.73
             chars = len(str(car_location))
-            m = (chars * 0.03) - 0.06
-            cx = cx - m
+            cx = cx 
             self.car_location_label.place_configure(relx=cx)
 
             located = True 
